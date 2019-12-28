@@ -238,10 +238,11 @@ class GLMath {
 
     static createViewMatrix(position, rotation) {
         let viewMatrix = glm.mat4(1.0);
+        const inversePosition = glm.vec3(-position.x, -position.y, -position.z);
         viewMatrix = glm.rotate(viewMatrix, glm.radians(rotation.x), glm.vec3(1, 0, 0));
         viewMatrix = glm.rotate(viewMatrix, glm.radians(rotation.y), glm.vec3(0, 1, 0));
         viewMatrix = glm.rotate(viewMatrix, glm.radians(rotation.z), glm.vec3(0, 0, 1));
-        viewMatrix = glm.translate(viewMatrix, -position);
+        viewMatrix = glm.translate(viewMatrix, inversePosition);
 
         return viewMatrix;
     }
@@ -307,8 +308,6 @@ class Renderer {
         //gl.enable(gl.CULL_FACE);
         //gl.cullFace(gl.BACK);
 
-        shader.Bind();
-
         // bind the VAO
         gl.bindVertexArray(model.VAO);
 
@@ -325,8 +324,6 @@ class Renderer {
 
         // unbind VAO
         gl.bindVertexArray(null);
-
-        shader.Unbind();
     }
 }
 
@@ -336,10 +333,20 @@ class Camera {
     constructor(position, rotation) {
         this.position = position;
         this.rotation = rotation; 
-    }
 
-    KeyboardEvents() {
-        
+        this.speed = 0.16;
+
+        document.addEventListener('keydown', e => {
+            if (e.key === "a") {
+                this.position.x -= this.speed;
+            } else if (e.key === "d") {
+                this.position.x += this.speed;
+            } else if (e.key === "w") {
+                this.position.z -= this.speed;
+            } else if (e.key === "s") {
+                this.position.z += this.speed;
+            }
+        });
     }
 
     getViewMatrix() {

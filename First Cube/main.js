@@ -118,7 +118,7 @@ function setup() {
     uniform mat4 viewMatrix;
      
     void main(void) {
-        gl_Position = projectionMatrix * transformationMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * viewMatrix * transformationMatrix * vec4(position, 1.0);
         pass_textureCoords = textureCoords;
     }
     `;
@@ -149,12 +149,25 @@ function setup() {
 }
 
 
-
+let time1 = 0, time2 = 0;
 function loop() {
+
+    time2 = Date.now();
+    let deltaTime = time2 - time1;
+    deltaTime /= 1000;
+    time1 = time2;
+
+    camera.speed = deltaTime * 10;
 
     clear();
     entity.rotate(0, 1, 1);
+
+    shader.Bind();
+    shader.loadViewMatrix(camera.getViewMatrix());
+
     renderer.Draw(entity, shader);
+
+    shader.Unbind();
 
     window.requestAnimationFrame(loop);
 }
